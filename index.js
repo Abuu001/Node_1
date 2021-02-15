@@ -1,9 +1,15 @@
 const express = require('express')
-const  http = require('http')
+const  http = require('http') 
 const app= express();
 const server =  http.createServer(app)
 require('dotenv').config({ path : './config/dev.env' })
+const morgan=require('morgan')
+const cors = require('cors')
 
+//  middlewares
+app.use(morgan('dev'))
+app.use(cors())
+app.use('/v1/api',require('./routes/routes'))
 
 
 const PORT = process.env.PORT || 3004;
