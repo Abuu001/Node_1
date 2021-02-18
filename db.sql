@@ -22,4 +22,10 @@ INSERT INTO lessons(lesson_name,time_stamp) VALUES('MATH','10 .20 pm');
 
 SELECT  lesson_name,lesson_id,lesson_fk,time_stamp,sender,text_field FROM lessons LEFT JOIN messages ON lesson_id=lesson_fk;
  
+CREATE TABLE users(
+    id uuid  DEFAULT  uuid_generate_v4 () ,
+    users_id BIGSERIAL,
+    username VARCHAR(70) UNIQUE NOT NULL,
+    user_password  VARCHAR(70) NOT NULL
+);
 
