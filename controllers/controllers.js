@@ -1,51 +1,87 @@
 const pool = require('../config/db')
 const moment= require('moment')
 
+/**
+ * getTime
+ * @type {string}
+ */
 
-// for posting channel
-const postChannel=async(req,res)=>{
+/**
+ * 
+ * @todo Add CRUD routes
+ */
+// for posting Message
+/**@function postMessage */
+const postMessage=async(req,res)=>{
     try {
-   
-         db.query()
+        const getTime =moment().format('LT');
+        const {message,name} = req.body
+
+        let response =await pool.query("INSERT INTO messages (sender,text_field,time_sent) VALUES ($1,$2,$3) RETURNING *",[name,message,getTime]);
+        res.status(200).json( response.rows[0])
     } catch (error) {
-        res.status(500).json({ message : "An unexpected error occurred" })
+        res.status(500).json({ message : "Failed to add message" })  
+        console.log(error);
     }
 }
 
-// for getting  all channel
-const getChannels=async(req,res)=>{
+/**
+ * Function runs asynchronously
+ * @async 
+ */
+// for getting  all Message
+const getMessages=async(req,res)=>{
     try {
+        let response =await pool.query("SELECT  lesson_name,time_stamp,lesson_id,lesson_fk,sender,text_field FROM lessons LEFT JOIN messages ON lesson_id=lesson_fk");
+        res.status(200).json( {
+            length : response.rows.length,
+            mesage : response.rows
+        })
          
     } catch (error) {
         res.status(500).json({ message : "An unexpected error occurred" })
     }
 }
 
-// for getting a channel
-const getChannel=async(req,res)=>{
-    try {
-         const {id}= req.params;
+// for getting a Message
+const getMessage=async(req,res)=>{
+    try {   
+        const {id} = req.params;
+ 
+        let response =await pool.query("SELECT * FROM messages WHERE lesson_fk=$1",[id]);
+        res.status(200).json({
+            message : response.rows[0]
+        })
          
     } catch (error) {
         res.status(500).json({ message : "An unexpected error occurred" })
     }
 }
 
-// for deleting channel
-const deleteChannel=async(req,res)=>{
-    try {
-         const {id}= req.params;
-        // const deleted = 
-    } catch (error) {
-        res.status(500).json({ message : "An unexpected error occurred" })
-    }
-}
-
-// for updating  all channel
-const updateChannel=async(req,res)=>{
+// for deleting Message
+const deleteMessage=async(req,res)=>{
     try {
         const {id} = req.params;
-        const changes =req.body;
+        let response =await pool.query("DELETE  FROM messages WHERE lesson_fk=$1",[id]);
+        res.status(200).json({
+            message :"Record deleted successfully"
+        })
+    } catch (error) {
+        res.status(500).json({ message : "An unexpected error occurred" })
+    }
+}
+
+// for updating  all Message
+const updateMessage=async(req,res)=>{
+    try {
+        const {id} = req.params;
+        const {sender,text_field}=req.body
+        const getTime =moment().format('LT'); 
+
+       let response =await pool.query("UPDATE messages SET  sender=$1,text_field=$2,time_sent=$3 WHERE lesson_fk=$4 RETURNING *",[sender,text_field,getTime,id]);
+       res.status(201).json({
+        message : response.rows[0]
+    }) 
 
     } catch (error) {
         res.status(500).json({ message : "An unexpected error occurred" })
@@ -85,6 +121,7 @@ const getLessons=async(req,res)=>{
 const getLesson=async(req,res)=>{
     try {
          const {id} = req.params;
+  
          let response =await pool.query("SELECT * FROM lessons WHERE id=$1",[id]);
          res.status(200).json({
              message : response.rows[0]
@@ -116,7 +153,7 @@ const updateLesson=async(req,res)=>{
 
        let response =await pool.query("UPDATE lessons SET  lesson_name=$1,time_stamp=$2 WHERE id=$3 RETURNING *",[name,getTime,id]);
 
-        res.status(200).json({
+        res.status(201).json({
             message : response.rows[0]
         })
     } catch (error) {
@@ -125,13 +162,13 @@ const updateLesson=async(req,res)=>{
 }
 
 module.exports={
-    postChannel,
-    getChannels,
-    getChannel,
-    updateChannel,
+    postMessage,
+    getMessages,
+    getMessage,
+    updateMessage,
+    deleteMessage,
     postLessons,
     getLessons,
-    deleteChannel,
     deleteLesson,
     getLesson,
     updateLesson

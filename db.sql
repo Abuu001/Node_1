@@ -13,9 +13,13 @@ CREATE TABLE messages(
     id uuid  DEFAULT  uuid_generate_v4 () ,
     sender VARCHAR(50) NOT NULL ,
     text_field  TEXT NOT NULL,
-    time_stamp VARCHAR(17) ,
-    lesson_fk  INT,
+    time_sent VARCHAR(17) ,
+    lesson_fk  BiGSERIAL,
    CONSTRAINT lesson_fk FOREIGN KEY(lesson_fk)  REFERENCES lessons(lesson_id) ON DELETE CASCADE
 );
  
 INSERT INTO lessons(lesson_name,time_stamp) VALUES('MATH','10 .20 pm');
+
+SELECT  lesson_name,lesson_id,lesson_fk,time_stamp,sender,text_field FROM lessons LEFT JOIN messages ON lesson_id=lesson_fk;
+ 
+
