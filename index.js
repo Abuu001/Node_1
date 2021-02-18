@@ -12,9 +12,9 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use('/v1/api',require('./routes/routes'))
 
-if(process.env.NODE_ENV==='production'){
-    app.use(express.static(path.join(__dirname,'./client/build')))
-} 
+// if(process.env.NODE_ENV==='production'){
+//     app.use(express.static(path.join(__dirname,'./client/build')))
+// } 
 
 const PORT = process.env.PORT || 3004;
 server.listen(PORT,()=>console.log(`Server listening on port ${PORT}`))

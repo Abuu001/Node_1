@@ -11,11 +11,10 @@
   "scripts": {
     "start": "node index",
     "dev": "nodemon index",
-    "doc" : "jsdoc -c jsdoc.json",
-    "heroku-postbuild": "cd client &&  npm install && npm run build" 
+    "doc" : "jsdoc -c jsdoc.json" 
   },
   "keywords": [],
-  "author": "",
+  "author": "", 
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
