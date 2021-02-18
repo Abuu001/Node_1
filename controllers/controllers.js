@@ -1,5 +1,6 @@
 const pool = require('../config/db')
 const moment= require('moment')
+const bcrypt = require('bcrypt');
 
 /**
  * getTime
@@ -81,7 +82,7 @@ const updateMessage=async(req,res)=>{
        let response =await pool.query("UPDATE messages SET  sender=$1,text_field=$2,time_sent=$3 WHERE lesson_fk=$4 RETURNING *",[sender,text_field,getTime,id]);
        res.status(201).json({
         message : response.rows[0]
-    }) 
+       }) 
 
     } catch (error) {
         res.status(500).json({ message : "An unexpected error occurred" })
@@ -161,6 +162,84 @@ const updateLesson=async(req,res)=>{
     }
 }
 
+//======================================USERS ===========================================
+// add user
+const getUsers=async(req,res)=>{
+    try {
+        let response =await pool.query("SELECT * FROM users ORDER BY users_id ASC");
+        res.status(200).json( {
+            length : response.rows.length,
+            mesage : response.rows
+        })
+    } catch (error) {
+        res.status(500).json({ message : "An unexpected error occurred" })
+    }
+}
+
+// post a user
+const addUser=async(req,res)=>{
+    try {
+        const {username,user_password} = req.body;
+        if (!(username && user_password)){
+          return  res.status(400).json({message : "Fill in the missing fields"});
+        } 
+         
+        //hashing password
+        const saltRounds =10;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const bcryptedPass =await bcrypt.hash(user_password,salt); 
+
+        let response =await pool.query("INSERT INTO users (username,user_password) VALUES ($1,$2) RETURNING *",[username,bcryptedPass]);
+        res.status(200).json( response.rows[0]);
+    } catch (error) { 
+        res.status(500).json({ message : "An unexpected error occurred" });
+    }
+} 
+
+// get specific user
+const getUsername=async(req,res)=>{
+    try {
+         const {username} = req.params;
+         let response =await pool.query("SELECT * FROM users WHERE username=$1",[username]);
+         res.status(200).json({
+             message : response.rows[0]
+         }); 
+    } catch (error) {
+        res.status(500).json({ message : "An unexpected error occurred" })
+    }
+}
+ // endpoint for logging in 
+const Login=async(req,res)=>{
+    try {
+        const {username,user_password} = req.body;
+        if (!(username && user_password)){
+            return  res.status(400).json({message : "Fill in the missing fields"});
+        } 
+
+        let user =await pool.query("SELECT * FROM users WHERE username=$1",[username]);
+
+        //check if username has been taken
+        if (user.rows.length > 1) {
+            return  res.status(400).json({message : "Username has been taken"});
+        }
+  
+        //check if user already exists
+        if (user.rows.length < 1) {
+            return  res.status(400).json({message : "User does not exist"});
+        }
+
+        //check if the password match with the hashed one.
+        const validPassword = await bcrypt.compare(user_password,user.rows[0].user_password)
+        if (!validPassword) {
+          return  res.status(400).json({message : "Credentials do not match"});
+        }  
+      
+        res.status(200).json( {message : `You're logged in successfully. Welcome back ${username}` }) 
+    } catch (error) { 
+        res.status(500).json({ message : "An unexpected error occurred" })
+    }
+} 
+
 module.exports={
     postMessage,
     getMessages,
@@ -171,5 +250,9 @@ module.exports={
     getLessons,
     deleteLesson,
     getLesson,
-    updateLesson
+    updateLesson,
+    addUser,
+    getUsers,
+    getUsername,
+    Login
 }
