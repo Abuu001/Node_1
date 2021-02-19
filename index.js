@@ -23,7 +23,7 @@ const sessionConfig={
 }
  
 //  middlewares 
-if (process.env.NODE_ENV==='production'){
+if (process.env.NODE_ENV!=='production'){
     const morgan=require('morgan') 
     app.use(morgan('dev'));
 }
