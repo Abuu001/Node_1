@@ -3,7 +3,6 @@ const  http = require('http')
 const app= express();
 const server =  http.createServer(app)
 require('dotenv').config()
-const morgan=require('morgan') 
 const cors = require('cors')
 const session = require('express-session')
 const restricted = require('./Auth/restricted-middleware')
@@ -24,10 +23,13 @@ const sessionConfig={
 }
  
 //  middlewares 
+if (process.env.NODE_ENV==='production'){
+    const morgan=require('morgan') 
+    app.use(morgan('dev'));
+}
 app.use(cors()); 
 app.use(express.json());
 app.use(session(sessionConfig));
-app.use(morgan('dev'));
 app.use(helmet());
 app.use('/v1/api',restricted,require('./routes/routes'));  
 app.use('/v1/api/user/login',authRoutes.Login); 
