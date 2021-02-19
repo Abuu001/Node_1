@@ -31,9 +31,9 @@ app.use(cors());
 app.use(express.json());
 app.use(session(sessionConfig));
 app.use(helmet());
-app.use('/v1/api',restricted,require('./routes/routes'));  
 app.use('/v1/api/user/login',authRoutes.Login); 
 app.use('/v1/api/register/user',authRoutes.registerUser); 
+app.use('/v1/api',restricted,require('./routes/routes'));  
 app.use('/v1/api/user/logout',authRoutes.Logout); 
 
 // if(process.env.NODE_ENV==='production'){
