@@ -13,9 +13,8 @@ router.get('/lesson/:id',controller.getLesson);
 router.delete('/lesson/:id',controller.deleteLesson);
 router.patch('/lesson/:id',controller.updateLesson);
 
-router.post('/register/user',controller.addUser);
 router.get('/users',controller.getUsers);
 router.get('/user/:username',controller.getUsername);
-router.post('/user/login',controller.Login);
 
-module.exports= router; 
+module.exports= router;
+
